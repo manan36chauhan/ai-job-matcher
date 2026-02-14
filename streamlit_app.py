@@ -2,8 +2,16 @@ import streamlit as st
 import requests
 
 API = "http://127.0.0.1:8000"
+st.caption(f"API: {API}")
+if st.button("Check API /health"):
+    rr = requests.get(f"{API}/health")
+    st.write("Status:", rr.status_code)
+    try:
+        st.json(rr.json())
+    except Exception:
+        st.text(rr.text[:2000])
 
-st.title("AI Job Matcher (MVP)")
+st.title("Job Matcher")
 
 st.header("1) Create Candidate")
 name = st.text_input("Name", "Manan")
@@ -16,14 +24,24 @@ if st.button("Create candidate"):
         "profile_text": profile_text,
         "location_pref": location_pref
     })
-    st.write(r.status_code, r.json())
+    st.write("Status:", r.status_code)
+    try:
+        st.json(r.json())
+    except Exception:
+        st.text(r.text[:2000])
+
 
 st.header("2) Import Jobs CSV")
 csv_file = st.file_uploader("Upload jobs.csv", type=["csv"])
 if st.button("Import CSV") and csv_file:
     files = {"file": (csv_file.name, csv_file.getvalue(), "text/csv")}
     r = requests.post(f"{API}/jobs/import_csv", files=files)
-    st.write(r.status_code, r.json())
+    st.write("Status:", r.status_code)
+    try:
+        st.json(r.json())
+    except Exception:
+        st.text(r.text[:2000])
+
 
 st.header("3) Match")
 candidate_id = st.number_input("Candidate ID", min_value=1, value=1)
